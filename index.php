@@ -46,17 +46,35 @@
                 }
             ?>
             <?php 
+            // print_r($_POST);
+            if(isset($_GET['id'])){
+                $id         = $_GET['id']; 
+                $sql        = "DELETE FROM user
+                WHERE id = '$id';";
+                $result     = $conn->query($sql);
+                $_GET = array();
+                $_POST = array();
+            }
             if (isset($_POST['id'])&&$_POST['id']!=null) {
+                $id         = $_POST['id'];
+                $nama       = $_POST['nama'];
+                $username   = $_POST['username'];
+                $email      = $_POST['email'];
                 $sql        = "UPDATE user
                 SET username = '$username', nama = '$nama', email = '$email'
-                WHERE condition;";
+                WHERE id = '$id';";
                 $result     = $conn->query($sql);
-            } else {
+                $_GET = array();
+                $_POST = array();
+            } else if(isset($_POST['nama'])){
+                $id         = $_POST['id'];
                 $nama       = $_POST['nama'];
                 $username   = $_POST['username'];
                 $email      = $_POST['email'];
                 $sql        = "INSERT INTO user(username,nama,email) VALUES ('$username','$nama','$email');";
                 $result     = $conn->query($sql);
+                $_GET = array();
+                $_POST = array();
             }
             ?>
             <div class="wrapper-page">
@@ -86,7 +104,7 @@
                         
                         <div class="form-group text-center m-t-30">
                             <div class="col-xs-12">
-                                <button class="btn btn-custom btn-bordred btn-block waves-effect waves-light" type="submit">Submit</button>
+                                <button class="btn btn-custom btn-bordred btn-block waves-effect waves-light submit" type="submit">Submit</button>
                             </div>
                         </div>
                     </fieldset>
@@ -116,12 +134,16 @@
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>
-                        <input type='hidden' id='id'>".$a."</td>";
+                        <input type='hidden' id='id_".$a."' value=".$row['id']." >
+                        <input type='hidden' id='username_".$a."' value=".$row['username']." >
+                        <input type='hidden' id='nama_".$a."' value=".$row['nama']." >
+                        <input type='hidden' id='email_".$a."' value=".$row['email']." >
+                        ".$a."</td>";
                         echo "<td>".$row['username']."</td>";
                         echo "<td>".$row['nama']."</td>";
                         echo "<td>".$row['email']."</td>";
                         echo "<td>
-                        <a href='#' class='btn btn-default btn-sm edit' id=".$row['id']." title='edit'>edit</a>
+                        <a href='#' class='btn btn-default btn-sm edit' id=".$a." title='edit'>edit</a>
                         <a href='#' class='btn btn-danger btn-sm cdelete' id=".$row['id']." title='delete'>delete</a>
                         </td>";
                         echo "</tr>";
@@ -141,6 +163,19 @@
 <script>
 $(function(){
 	$(".edit").click(function (e) {
+		var id = this.id;
+        var idx = $('#id_'+id).val();
+        var username = $('#username_'+id).val();
+        var nama = $('#nama_'+id).val();
+        var email = $('#email_'+id).val();
+        console.log(idx,username,nama,email);
+        $('#id').val(idx);
+        $('#username').val(username);
+        $('#nama').val(nama);
+        $('#email').val(email);
+	});
+	$(".submit").click(function (e) {
+        window.location.href = "http://localhost/ITS2";
 	});
 	$(".cdelete").click(function (e) {
 		e.preventDefault();
@@ -157,8 +192,7 @@ $(function(){
 			closeOnConfirm: false
 		}, function(result) {
 			if (result) {
-				var _url = $("#_url").val();
-				window.location.href = _url + "draft/delete/" + id;
+				window.location.href = "http://localhost/ITS2?id="+id;
 			}
 		})
 	});
